@@ -1,0 +1,295 @@
+//////////////////////////PREPROCESSOR DIRECTIVES/////////////////////////////
+
+#include "os_path.hpp"
+
+///////////////////////////NAMESPACES//////////////////////////
+
+using namespace std;
+
+//////////////////////////CONSTRUCTOR//////////////////////////
+
+os_path::os_path()
+{
+	m_info = {};
+}
+
+//////////////////////////DESTRUCTOR///////////////////////////
+
+os_path::~os_path()
+{
+}
+
+//////////////////////////ABSPATH//////////////////////////////
+
+string os_path::abspath(const string& path)
+{
+	string s_res = "";
+	string s_buf;
+	if (!os_path::exists(path))
+	{
+		printf("abspath()\n");
+		return s_res;
+	}
+
+#ifdef OS_LINUX
+	stack<string> stk_curr_dir;
+	FILE* f_pipe = popen("pwd", "r");
+	if (f_pipe == NULL)
+	{
+		printf("Error in execution of pwd command\n");
+		return s_res;
+	}
+
+	while (fgets(m_buffer.data(), MAXBUFFER, f_pipe) != NULL)
+	{
+		s_buf += m_buffer.data();
+	}
+	pclose(f_pipe);
+#else
+	// TODO
+#endif
+
+	string s_tmp;
+	stringstream ss_tokenizer1(s_buf);
+	while (getline(ss_tokenizer1, s_tmp, '/'))
+	{
+		stk_curr_dir.push(s_tmp);
+	}
+
+	s_tmp.clear();
+	stringstream ss_tokenizer2(path);
+	while (getline(ss_tokenizer2, s_tmp, '/'))
+	{
+		if (s_tmp == ".." && !stk_curr_dir.empty())
+		{
+			stk_curr_dir.pop();
+		}
+		else if (s_tmp != ".")
+		{
+			stk_curr_dir.push(s_tmp);
+		}
+	}
+
+	while (!stk_curr_dir.empty())
+	{
+		s_res = stk_curr_dir.top() + '/' + s_res;
+		stk_curr_dir.pop();
+	}
+
+	s_res.pop_back();
+	if (s_res[s_res.length() - 1] == '\n')
+	{
+		s_res.pop_back();
+	}
+	return s_res;
+}
+
+///////////////////////////////BASENAME///////////////////////////////////
+
+string os_path::basename(const string& path)
+{
+	return os_path::split(path).second;
+}
+
+///////////////////////////////COMMONPREFIX/////////////////////////////////
+
+string os_path::commonprefix(const vector<string>& paths)
+{
+	string s_res = "";
+	if (paths.size() == 0)
+	{
+		return s_res;
+	}
+	int min_length = INT_MAX;
+	for (string s_curr : paths)
+	{
+		min_length = min(min_length, static_cast<int>(s_curr.length()));
+	}
+	
+	for (int n_pos = 0; n_pos < min_length; n_pos++)
+	{
+		bool b_check = true;
+		char c_curr = paths[0][n_pos];
+		for (int n_str = 1; n_str < paths.size(); n_str++)
+		{
+			if (paths[n_str][n_pos] != c_curr)
+			{
+				b_check = false;
+				break;
+			}
+		}
+		if (b_check)
+		{
+			s_res += c_curr;
+		}
+		else
+		{
+			break;
+		}
+	}
+	return s_res;
+}
+
+/////////////////////////////////GETSTATINFO/////////////////////////////////
+
+int os_path::getstatinfo(const string& path)
+{
+	m_info = {};
+	return stat(path.c_str(), &m_info);
+}
+
+/////////////////////////////////EXISTS//////////////////////////////////
+
+bool os_path::exists(const string& path)
+{
+	if (getstatinfo(path) != 0 && errno == ENOENT)
+	{
+		return false;
+	}
+	return true;
+}
+
+//////////////////////////////////GETATIME////////////////////////////////
+
+double os_path::getatime(const string& path)
+{
+	double d_res = 0;
+	if (getstatinfo(path) == 0)
+	{
+		d_res = static_cast<double>(m_info.st_atim.tv_sec);
+	}
+	else
+	{
+		printf("Invalid path\n");
+	}
+	return d_res;
+}
+
+//////////////////////////////////GETMTIME////////////////////////////////
+
+double os_path::getmtime(const string& path)
+{
+	double d_res = 0;
+	if (getstatinfo(path) == 0)
+	{
+		d_res = static_cast<double>(m_info.st_mtim.tv_sec);
+	}
+	else
+	{
+		printf("Invalid path\n");
+	}
+	return d_res;
+}
+
+//////////////////////////////////GETCTIME////////////////////////////////
+
+double os_path::getctime(const string& path)
+{
+	double d_res = 0;
+	if (getstatinfo(path) == 0)
+	{
+		d_res = static_cast<double>(m_info.st_ctim.tv_sec);
+	}
+	else
+	{
+		printf("Invalid path\n");
+	}
+	return d_res;
+}
+
+////////////////////////////////GETFILESIZE/////////////////////////////////
+
+long int os_path::getfilesize(const string& path)
+{
+	long int l_res = -1;
+	if (getstatinfo(path) == 0 && S_ISREG(m_info.st_mode))
+	{
+		l_res = m_info.st_size;
+	}
+	else
+	{
+		printf("Invalid path\n");
+	}
+	return l_res;
+}
+
+///////////////////////////////////ISFILE//////////////////////////////////
+
+bool os_path::isfile(const string& path)
+{
+	bool b_res = false;
+	if (getstatinfo(path) == 0 && S_ISREG(m_info.st_mode))
+	{
+		b_res = true;
+	}
+	else
+	{
+		printf("Invalid path or path does not point to a regular file\n");
+	}
+	return b_res;
+}
+
+///////////////////////////////////ISDIR//////////////////////////////////
+
+bool os_path::isdir(const string& path)
+{
+	bool b_res = false;
+	if (getstatinfo(path) == 0 && S_ISDIR(m_info.st_mode))
+	{
+		b_res = true;
+	}
+	else
+	{
+		printf("Invalid path or path does not point to a directory\n");
+	}
+	return b_res;
+}
+
+///////////////////////////////////RELPATH////////////////////////////////
+
+string os_path::relpath(const string& path, string start)
+{
+	string s_res = "";
+	if (!os_path::exists(path))
+	{
+		return s_res;
+	}
+	// TODO
+}
+
+//////////////////////////////////SPLIT/////////////////////////////////
+
+pair<string, string> os_path::split(const string& path)
+{
+	string tail = "";
+	int n_char = path.length() - 1;
+	while (n_char >= 0 && path[n_char] != '/')
+	{
+		tail = path[n_char--] + tail;
+	}
+	while (n_char >= 0 && path[n_char] == '/')
+	{
+		n_char--;
+	}
+	string head(path, 0, n_char + 1);
+	return make_pair(head, tail);
+}
+
+///////////////////////////////////SPLITEXT///////////////////////////////////
+
+pair<string, string> os_path::splitext(const string& path)
+{
+	string ext = "";
+	int n_char = path.length() - 1;
+	while (n_char >= 0 && path[n_char] != '.')
+	{
+		ext = path[n_char--] + ext;
+	}
+	ext = path[n_char--] + ext;
+	string root(path, 0, n_char + 1);
+	return root.length() == 0 ? make_pair(ext, root) : make_pair(root, ext);
+}
+
+
+
+

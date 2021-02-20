@@ -23,13 +23,12 @@ os_path::~os_path()
 
 string os_path::abspath(const string& path)
 {
+	if (os_path::isabs(path))
+	{
+		return path;
+	}
 	string s_res = "";
 	string s_buf;
-	if (!os_path::exists(path))
-	{
-		printf("abspath()\n");
-		return s_res;
-	}
 
 #ifdef OS_LINUX
 	stack<string> stk_curr_dir;
@@ -213,6 +212,18 @@ long int os_path::getfilesize(const string& path)
 	return l_res;
 }
 
+///////////////////////////////////ISABS///////////////////////////////////
+
+bool os_path::isabs(const string& path)
+{
+	bool b_res = true;
+	if (path.length() == 0 || path[0] != '/')
+	{
+		b_res = false;
+	}
+	return b_res;
+}
+
 ///////////////////////////////////ISFILE//////////////////////////////////
 
 bool os_path::isfile(const string& path)
@@ -249,12 +260,11 @@ bool os_path::isdir(const string& path)
 
 string os_path::relpath(const string& path, string start)
 {
-	string s_res = "";
-	if (!os_path::exists(path))
+	if (!os_path::isabs(path))
 	{
-		return s_res;
+		return path;
 	}
-	// TODO
+	string s_res = "";
 }
 
 //////////////////////////////////SPLIT/////////////////////////////////
@@ -288,6 +298,57 @@ pair<string, string> os_path::splitext(const string& path)
 	ext = path[n_char--] + ext;
 	string root(path, 0, n_char + 1);
 	return root.length() == 0 ? make_pair(ext, root) : make_pair(root, ext);
+}
+
+//////////////////////////////////LISTDIR/////////////////////////////////////
+
+vector<string> os_path::listdir(const string& path)
+{
+	vector<string> res;
+	string s_buf = "";
+
+#ifdef OS_LINUX
+	string s_cmd = "ls " + path;
+	FILE* f_pipe = popen(s_cmd.c_str(), "r");
+	if (f_pipe == NULL)
+	{
+		printf("Error in command execution\n");
+		return res;
+	}
+	while (fgets(m_buffer.data(), MAXBUFFER, f_pipe) != NULL)
+	{
+		string s_buf = m_buffer.data();
+		s_buf.pop_back();
+		res.push_back(s_buf);
+	}
+	pclose(f_pipe);
+#else
+	// TODO
+#endif
+
+	return res;
+}
+
+////////////////////////////////WALK///////////////////////////////////
+
+void os_path::walk(const string& path, st_data& data)
+{
+#ifdef OS_LINUX
+	string s_cmd = "find " + path + " -print";
+	FILE* f_pipe = popen(s_cmd.c_str(), "r");
+	if (f_pipe == NULL)
+	{
+		printf("Error in command execution\n");
+	}
+	while (fgets(m_buffer.data(), MAXBUFFER, f_pipe) != NULL)
+	{
+		string s_buf = m_buffer.data();
+		s_buf.pop_back();
+		data.filenames.push_back(s_buf);
+	}
+#else
+	// TODO
+#endif
 }
 
 

@@ -28,6 +28,13 @@ using namespace std;
 
 ////////////////////////////CLASS DECLARATION/////////////////////////
 
+typedef struct st_data
+{
+	string dirpath;
+	vector<string> dirnames;
+	vector<string> filenames;
+} st_data;
+
 class os_path
 {
 	private:
@@ -119,6 +126,13 @@ class os_path
 		long int getfilesize(const string& path);
 
 		/**
+		 * Checks is path is absolute path
+		 * @param path - pathname
+		 * @returns true is absolute path, false otherwise
+		 */
+		bool isabs(const string& path);
+
+		/**
 		 * Checks if path is an existing regular file
 		 * @param path - pathname
 		 * @returns true if regular file, false otherwise
@@ -157,6 +171,23 @@ class os_path
 		 * @returns pair with root as first and ext as second
 		 */
 		pair<string, string> splitext(const string& path);
+
+		/**
+		 * Return a list containing names of entries in the
+		 * directory given by path
+		 * @param path - pathname
+		 * @returns vector of names of entries
+		 */
+		vector<string> listdir(const string& path);
+
+		/**
+		 * Generate filenames in a directory tree by walking
+		 * the tree in top-down manner. This function populates
+		 * the st_data struct object passed as argument
+		 * @param path - pathname to walk
+		 * @param data - st_data object to be populated
+		 */
+		void walk(const string& path, st_data& data);
 };
 
 #endif

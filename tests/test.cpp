@@ -3,7 +3,7 @@
 int main()
 {
 	os_path os;
-	cout << os.abspath("../src/os_path.hpp") << endl;
+	cout << os.abspath("") << endl;
 	cout << os.commonprefix({"/usr/lib/hrishi", "/usr/local/siddhu/ok", "/usr/lol"}) << endl;
 	cout << os.exists("") << endl;
 	printf("%lf\n", os.getatime("../../websock/"));
@@ -20,4 +20,13 @@ int main()
 
 	p = os.splitext(".vimrc");
 	cout << p.first << ", " << p.second << endl;
+	cout << os.relpath("src/ok") << endl;
+	vector<string> v = os.listdir("../../");
+	for (auto s : v)
+		cout << s << " ";
+	cout << endl;
+	st_data vd;
+	os.walk("../", vd);
+	for (auto s : vd.filenames)
+		cout << s << endl;
 }

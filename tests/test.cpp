@@ -26,7 +26,17 @@ int main()
 		cout << s << " ";
 	cout << endl;
 	st_data vd;
-	os.walk("../", vd);
-	for (auto s : vd.filenames)
-		cout << s << endl;
+	os.walk("..", vd);
+	for (int i = 0; i < vd.dirpath.size(); i++)
+	{
+		cout << vd.dirpath[i] << endl;
+		cout << "[";
+		for (string s : vd.dirnames[i])
+			cout << s << ", ";
+		cout << "]" << endl;
+		cout << "[";
+		for (string s : vd.filenames[i])
+			cout << s << ", ";
+		cout << "]" << endl;
+	}
 }

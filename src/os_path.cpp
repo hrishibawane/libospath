@@ -233,10 +233,6 @@ bool os_path::isfile(const string& path)
 	{
 		b_res = true;
 	}
-	else
-	{
-		printf("Invalid path or path does not point to a regular file\n");
-	}
 	return b_res;
 }
 
@@ -248,10 +244,6 @@ bool os_path::isdir(const string& path)
 	if (getstatinfo(path) == 0 && S_ISDIR(m_info.st_mode))
 	{
 		b_res = true;
-	}
-	else
-	{
-		printf("Invalid path or path does not point to a directory\n");
 	}
 	return b_res;
 }
@@ -331,26 +323,51 @@ vector<string> os_path::listdir(const string& path)
 
 ////////////////////////////////WALK///////////////////////////////////
 
-void os_path::walk(const string& path, st_data& data)
+void os_path::walk(string path, st_data& data)
 {
+	unordered_map<string, vector<string>> mp_dirnames;
+	unordered_map<string, vector<string>> mp_filenames;
+	vector<string> v_seq;
 #ifdef OS_LINUX
+	if (path[path.length() - 1] == '/')
+	{
+		path.pop_back();
+	}
 	string s_cmd = "find " + path + " -print";
 	FILE* f_pipe = popen(s_cmd.c_str(), "r");
 	if (f_pipe == NULL)
 	{
 		printf("Error in command execution\n");
+		return;
 	}
 	while (fgets(m_buffer.data(), MAXBUFFER, f_pipe) != NULL)
 	{
 		string s_buf = m_buffer.data();
 		s_buf.pop_back();
-		data.filenames.push_back(s_buf);
+		pair<string, string> p;
+		if (os_path::isdir(s_buf))
+		{
+			p = os_path::split(s_buf);
+			mp_dirnames[p.first].push_back(p.second);
+			v_seq.push_back(s_buf);
+		}
+		else if (os_path::isfile(s_buf))
+		{
+			p = os_path::split(s_buf);
+			mp_filenames[p.first].push_back(p.second);
+		}
 	}
 #else
 	// TODO
 #endif
+	for (string s_dir : v_seq)
+	{
+		data.dirpath.push_back(s_dir);
+		data.dirnames.push_back(mp_dirnames[s_dir]);
+		data.filenames.push_back(mp_filenames[s_dir]);
+	}
+	cout << data.dirpath.size() << " " << data.dirnames.size() << " " << data.filenames.size() << endl;
 }
-
 
 
 

@@ -18,6 +18,7 @@
 #include <vector>
 #include <array>
 #include <stack>
+#include <unordered_map>
 #include <sstream>
 #include <climits>
 #include <sys/stat.h>
@@ -30,9 +31,9 @@ using namespace std;
 
 typedef struct st_data
 {
-	string dirpath;
-	vector<string> dirnames;
-	vector<string> filenames;
+	vector<string> dirpath;
+	vector<vector<string>> dirnames;
+	vector<vector<string>> filenames;
 } st_data;
 
 class os_path
@@ -187,7 +188,7 @@ class os_path
 		 * @param path - pathname to walk
 		 * @param data - st_data object to be populated
 		 */
-		void walk(const string& path, st_data& data);
+		void walk(string path, st_data& data);
 };
 
 #endif

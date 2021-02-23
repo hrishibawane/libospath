@@ -1,2 +1,4 @@
 tests/*.o
 tests/test
+install/
+build/

@@ -28,7 +28,7 @@ string os_path::abspath(const string& path)
 		return path;
 	}
 	string s_res = "";
-	string s_buf;
+	string s_buf = "";
 
 #ifdef OS_LINUX
 	stack<string> stk_curr_dir;
@@ -250,13 +250,54 @@ bool os_path::isdir(const string& path)
 
 ///////////////////////////////////RELPATH////////////////////////////////
 
-string os_path::relpath(const string& path, string start)
+string os_path::relpath(const string& path)
 {
 	if (!os_path::isabs(path))
 	{
 		return path;
 	}
 	string s_res = "";
+	string s_curr_path = os_path::abspath(".");
+	string s_target_path = path;
+	vector<string> v_curr;
+	vector<string> v_target;
+	string s_tmp;
+	stringstream ss_tokenizer1(s_curr_path);
+	while (getline(ss_tokenizer1, s_tmp, '/'))
+	{
+		v_curr.push_back(s_tmp);
+	}
+
+	s_tmp.clear();
+	stringstream ss_tokenizer2(s_target_path);
+	while (getline(ss_tokenizer2, s_tmp, '/'))
+	{
+		v_target.push_back(s_tmp);
+	}
+
+	int n_limit = min(v_curr.size(), v_target.size());
+	int n_cnt = v_curr.size();
+	int i = 0;
+	while (i < n_limit)
+	{
+		if (v_curr[i] != v_target[i])
+		{
+			n_cnt = i;
+			break;
+		}
+		i++;
+	}
+	int n_up = v_curr.size() - n_cnt;
+	while (n_up--)
+	{
+		s_res += "../";
+	}
+	while (i < v_target.size())
+	{
+		s_res += v_target[i++] + "/";
+	}
+	s_res.pop_back();
+	return s_res;
 }
 
 //////////////////////////////////SPLIT/////////////////////////////////
@@ -317,7 +358,6 @@ vector<string> os_path::listdir(const string& path)
 #else
 	// TODO
 #endif
-
 	return res;
 }
 

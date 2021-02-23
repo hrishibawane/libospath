@@ -3,7 +3,7 @@
 int main()
 {
 	os_path os;
-	cout << os.abspath("") << endl;
+	cout << os.abspath(".") << endl;
 	cout << os.commonprefix({"/usr/lib/hrishi", "/usr/local/siddhu/ok", "/usr/lol"}) << endl;
 	cout << os.exists("") << endl;
 	printf("%lf\n", os.getatime("../../websock/"));
@@ -39,4 +39,5 @@ int main()
 			cout << s << ", ";
 		cout << "]" << endl;
 	}
+	cout << os.relpath("") << endl;
 }

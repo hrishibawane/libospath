@@ -154,7 +154,7 @@ class os_path
 		 * @param start - optional start directory
 		 * @returns relative path
 		 */
-		string relpath(const string& path, string start = ".");
+		string relpath(const string& path);
 
 		/**
 		 * Split the pathname path into a pair, (head, tail)

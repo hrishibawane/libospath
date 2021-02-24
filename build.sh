@@ -2,7 +2,7 @@ cd build && cmake .. -DCMAKE_INSTALL_PREFIX=../install
 
 make install
 
-rm libospath.a
+mv libospath.a /lib/
 
 mv Makefile ../Makefile
 

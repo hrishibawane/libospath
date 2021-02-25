@@ -2,3 +2,4 @@ tests/*.o
 tests/test
 install/
 build/
+tests/src/test

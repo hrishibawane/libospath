@@ -1,3 +1,6 @@
+#pragma once
+#ifndef TESTABSPATH_HPP
+#define TESTABSPATH_HPP
 
 #include <cppunit/TestCase.h>
 #include <cppunit/TestFixture.h>
@@ -8,35 +11,27 @@
 using namespace std;
 using namespace CppUnit;
 
-class CTestAbspath
+class CTestAbspath : public CppUnit::TestFixture
 {
 	private:
+		CPPUNIT_TEST_SUITE(CTestAbspath);
+		CPPUNIT_TEST(TestCurrDir);
+		CPPUNIT_TEST(TestPrevDir);
+		CPPUNIT_TEST(TestNextDir);
+		CPPUNIT_TEST(TestRandomDir);
+		CPPUNIT_TEST_SUITE_END();
+
 		os_path* m_pObj;
 
 	public:
-		CTestAbspath();
-		~CTestAbspath();
-		void Test1();
-		void Test2();
+		void setUp();
+		void tearDown();
+		void TestCurrDir();
+		void TestPrevDir();
+		void TestNextDir();
+		void TestRandomDir();
 };
 
-CTestAbspath::CTestAbspath()
-{
-	m_pObj = new os_path();
-}
 
-CTestAbspath::~CTestAbspath()
-{
-	delete m_pObj;
-}
-
-void CTestAbspath::Test1()
-{
-	CPPUNIT_ASSERT_MESSAGE("Prob in Test1()", "/home/hrishib/Hrishi/cos/tests/src" == m_pObj->abspath("."));
-}
-
-void CTestAbspath::Test2()
-{
-	CPPUNIT_ASSERT_MESSAGE("Prob in Test2()", "/home/hrishib/Hrishi/" == m_pObj->abspath("."));
-}
+#endif
 

@@ -48,6 +48,7 @@ string os_path::abspath(const string& path)
 	// TODO
 #endif
 
+	if (s_buf[s_buf.length() - 1] == '\n') s_buf.pop_back();
 	string s_tmp;
 	stringstream ss_tokenizer1(s_buf);
 	while (getline(ss_tokenizer1, s_tmp, '/'))

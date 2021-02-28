@@ -3,5 +3,8 @@ CXX = g++
 EXE = test
 LIBFLAGS = -lospath -lcppunit
 
-test:
+test: clean
 	$(CXX) *.cpp -o $(EXE) $(LIBFLAGS)
+
+clean:
+	rm test

@@ -34,7 +34,21 @@ void CTestAbspath::TestRandomDir()
 {
 	CPPUNIT_ASSERT_EQUAL(string("/abc/def/ghi/jkl"), m_pObj->abspath("../../../../../../abc/def/ghi/jkl"));
 	CPPUNIT_ASSERT_EQUAL(string("/abc/def/ghi/jkl/x.cpp"), m_pObj->abspath("../../../../../../abc/def/ghi/jkl/x.cpp"));
+	CPPUNIT_ASSERT_EQUAL(string("/home/hrishib/Hrishi/cos"), m_pObj->abspath("../../.././cos"));
 }
 
+void CTestAbspath::TestAbvRootDir()
+{
+	CPPUNIT_ASSERT_EQUAL(string("/abc"), m_pObj->abspath("../../../../../../../../../../abc"));
+}
 
+void CTestAbspath::TestBlank()
+{
+	CPPUNIT_ASSERT_EQUAL(string("/home/hrishib/Hrishi/cos/tests/src"), m_pObj->abspath(""));
+}
+
+void CTestAbspath::TestAbsPath()
+{
+	CPPUNIT_ASSERT_EQUAL(string("/home/hrishib"), m_pObj->abspath("/home/hrishib"));
+}
 

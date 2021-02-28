@@ -48,7 +48,9 @@ string os_path::abspath(const string& path)
 	// TODO
 #endif
 
-	if (s_buf[s_buf.length() - 1] == '\n') s_buf.pop_back();
+	if (s_buf[s_buf.length() - 1] == '\n')
+		s_buf.pop_back();
+
 	string s_tmp;
 	stringstream ss_tokenizer1(s_buf);
 	while (getline(ss_tokenizer1, s_tmp, '/'))
@@ -64,7 +66,7 @@ string os_path::abspath(const string& path)
 		{
 			stk_curr_dir.pop();
 		}
-		else if (s_tmp != ".")
+		else if (s_tmp != "." && s_tmp != "..")
 		{
 			stk_curr_dir.push(s_tmp);
 		}
@@ -75,12 +77,10 @@ string os_path::abspath(const string& path)
 		s_res = stk_curr_dir.top() + '/' + s_res;
 		stk_curr_dir.pop();
 	}
-
+	// Remove extra '/'
 	s_res.pop_back();
-	if (s_res[s_res.length() - 1] == '\n')
-	{
-		s_res.pop_back();
-	}
+	if (s_res[0] != '/')
+		s_res = '/' + s_res;
 	return s_res;
 }
 

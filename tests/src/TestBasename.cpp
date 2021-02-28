@@ -23,6 +23,7 @@ void CTestBasename::TestForRelpath()
 	CPPUNIT_ASSERT_EQUAL(string("xyz"), m_pObj->basename("../../xyz"));
 	CPPUNIT_ASSERT_EQUAL(string("text.txt"), m_pObj->basename("../../xyz/text.txt"));
 	CPPUNIT_ASSERT_EQUAL(string(".."), m_pObj->basename("../.."));
+	CPPUNIT_ASSERT_EQUAL(string("."), m_pObj->basename("."));
 	CPPUNIT_ASSERT_EQUAL(string(""), m_pObj->basename("./"));
 }
 

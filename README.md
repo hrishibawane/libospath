@@ -1,11 +1,19 @@
-## libospath - Common pathname manipulations
+# libospath
 
-C++ implementation of Python's os.path module.
-Work in progress...
+C++ counterpart of Python's os.path module. Provides common pathname manipulations and access to filesystem in your C++ code.
 
-### Integration
+## Integration
 
-- Clone the repository by ```git clone https://github.com/hrishibawane/libospath.git```
-- Run script ```sudo ./build.sh```
-- Now, the library can be used from anywhere in your system using ```g++ source_file.cpp -lospath```
+- Clone the repository - ```git clone https://github.com/hrishibawane/libospath.git```
 
+### Install library
+
+- Run ```sudo ./install.sh```
+- Now, the library can be used from anywhere locally using ```g++ source_file.cpp -lospath```
+
+### Tests
+
+- ```cd tests/src```
+- ```make test```
+
+Note: Make sure to install first before running the tests.

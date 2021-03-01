@@ -9,7 +9,8 @@ C++ counterpart of Python's os.path module. Provides common pathname manipulatio
 ### Install library
 
 - Run ```sudo ./install.sh```
-- Now, the library can be used from anywhere locally using ```g++ source_file.cpp -lospath```
+- Now, the library can be used from anywhere locally.
+- Include the header file ```os_path.hpp``` and compile using ```g++ source_file.cpp -lospath```
 
 ### Tests
 

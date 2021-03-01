@@ -130,6 +130,13 @@ string os_path::commonprefix(const vector<string>& paths)
 	return s_res;
 }
 
+///////////////////////////////DIRNAME///////////////////////////////////
+
+string os_path::dirname(const string& path)
+{
+	return os_path::split(path).first;
+}
+
 /////////////////////////////////GETSTATINFO/////////////////////////////////
 
 int os_path::getstatinfo(const string& path)

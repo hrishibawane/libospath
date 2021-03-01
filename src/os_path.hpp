@@ -87,6 +87,13 @@ class os_path
 		string commonprefix(const vector<string>& paths);
 
 		/**
+		 * Return the directory name of pathname path
+		 * @param path - pathname
+		 * @returns directory's absolute path name
+		 */
+		 string dirname(const string& path);
+
+		/**
 		 * Check if path refers to an existing(valid) path
 		 * @param path - pathname
 		 * @returns true if valid, false otherwise

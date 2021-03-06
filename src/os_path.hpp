@@ -7,7 +7,7 @@
 
 #if defined(_WIN32) || defined(_WIN64)
 #define OS_WINDOWS 1
-#else
+#elif defined(__linux__)
 #define OS_LINUX 1
 #endif
 #define MAXBUFFER 4096
@@ -43,7 +43,11 @@ class os_path
 		array<char, MAXBUFFER> m_buffer;
 
 		/* stat struct to store and retrieve file info */
+#ifdef OS_LINUX
 		struct stat m_info;
+#elif OS_WINDOWS
+		struct _stat m_info;
+#endif
 
 		/**
 		 * Generic function to invoke stat() system call

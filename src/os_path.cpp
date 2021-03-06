@@ -29,13 +29,16 @@ string os_path::abspath(const string& path)
 	}
 	string s_res = "";
 	string s_buf = "";
+	stack<string> stk_curr_dir;
 
 #ifdef OS_LINUX
-	stack<string> stk_curr_dir;
 	FILE* f_pipe = popen("pwd", "r");
+#elif OS_WINDOWS
+	FILE* f_pipe = popen("cd", "r");
+#endif
 	if (f_pipe == NULL)
 	{
-		printf("Error in execution of pwd command\n");
+		printf("Error in execution of command\n");
 		return s_res;
 	}
 
@@ -44,10 +47,6 @@ string os_path::abspath(const string& path)
 		s_buf += m_buffer.data();
 	}
 	pclose(f_pipe);
-#else
-	// TODO
-#endif
-
 	if (s_buf[s_buf.length() - 1] == '\n')
 		s_buf.pop_back();
 
@@ -142,7 +141,11 @@ string os_path::dirname(const string& path)
 int os_path::getstatinfo(const string& path)
 {
 	m_info = {};
+#ifdef OS_LINUX
 	return stat(path.c_str(), &m_info);
+#elif OS_WINDOWS
+	return _stat(path.c_str(), &m_info);
+#endif
 }
 
 /////////////////////////////////EXISTS//////////////////////////////////
@@ -347,9 +350,12 @@ vector<string> os_path::listdir(const string& path)
 {
 	vector<string> res;
 	string s_buf = "";
-
+	string s_cmd;
 #ifdef OS_LINUX
-	string s_cmd = "ls " + path;
+	s_cmd = "ls " + path;
+#elif OS_WINDOWS
+	s_cmd = "dir " + path;
+#endif
 	FILE* f_pipe = popen(s_cmd.c_str(), "r");
 	if (f_pipe == NULL)
 	{
@@ -363,9 +369,6 @@ vector<string> os_path::listdir(const string& path)
 		res.push_back(s_buf);
 	}
 	pclose(f_pipe);
-#else
-	// TODO
-#endif
 	return res;
 }
 
@@ -376,12 +379,16 @@ void os_path::walk(string path, st_data& data)
 	unordered_map<string, vector<string>> mp_dirnames;
 	unordered_map<string, vector<string>> mp_filenames;
 	vector<string> v_seq;
-#ifdef OS_LINUX
 	if (path[path.length() - 1] == '/')
 	{
 		path.pop_back();
 	}
-	string s_cmd = "find " + path + " -print";
+	string s_cmd;
+#ifdef OS_LINUX
+	s_cmd = "find " + path + " -print";
+#elif OS_WINDOWS
+	s_cmd = "dir /s /b " + path;
+#endif
 	FILE* f_pipe = popen(s_cmd.c_str(), "r");
 	if (f_pipe == NULL)
 	{
@@ -405,9 +412,6 @@ void os_path::walk(string path, st_data& data)
 			mp_filenames[p.first].push_back(p.second);
 		}
 	}
-#else
-	// TODO
-#endif
 	for (string s_dir : v_seq)
 	{
 		data.dirpath.push_back(s_dir);

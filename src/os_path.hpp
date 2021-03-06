@@ -42,13 +42,14 @@ class os_path
 		/* buffer for data transfers */
 		array<char, MAXBUFFER> m_buffer;
 
+		/* seperator for paths (OS dependent)*/
+		char m_sep;
+
 		/* stat struct to store and retrieve file info */
 #ifdef OS_LINUX
 		struct stat m_info;
-		char m_sep = '/';
 #elif OS_WINDOWS
 		struct _stat m_info;
-		char m_sep = '\\';
 #endif
 
 		/**

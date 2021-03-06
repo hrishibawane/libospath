@@ -207,9 +207,9 @@ double os_path::getctime(const string& path)
 	if (getstatinfo(path) == 0)
 	{
 #ifdef OS_LINUX
-		d_res = static_cast<double>(m_info.st_mtim.tv_sec);
+		d_res = static_cast<double>(m_info.st_ctim.tv_sec);
 #elif OS_WINDOWS
-		d_res = static_cast<double>(m_info.st_mtime);
+		d_res = static_cast<double>(m_info.st_ctime);
 #endif
 	}
 	else

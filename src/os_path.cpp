@@ -166,7 +166,11 @@ double os_path::getatime(const string& path)
 	double d_res = 0;
 	if (getstatinfo(path) == 0)
 	{
+#ifdef OS_LINUX
 		d_res = static_cast<double>(m_info.st_atim.tv_sec);
+#elif OS_WINDOWS
+		d_res = static_cast<double>(m_info.st_atime);
+#endif
 	}
 	else
 	{
@@ -182,7 +186,11 @@ double os_path::getmtime(const string& path)
 	double d_res = 0;
 	if (getstatinfo(path) == 0)
 	{
+#ifdef OS_LINUX
 		d_res = static_cast<double>(m_info.st_mtim.tv_sec);
+#elif OS_WINDOWS
+		d_res = static_cast<double>(m_info.st_mtime);
+#endif
 	}
 	else
 	{
@@ -198,7 +206,11 @@ double os_path::getctime(const string& path)
 	double d_res = 0;
 	if (getstatinfo(path) == 0)
 	{
+#ifdef OS_LINUX
 		d_res = static_cast<double>(m_info.st_ctim.tv_sec);
+#elif OS_WINDOWS
+		d_res = static_cast<double>(m_info.st_ctime);
+#endif
 	}
 	else
 	{
@@ -293,11 +305,11 @@ string os_path::relpath(const string& path)
 	{
 		if (v_curr[i] != v_target[i])
 		{
-			n_cnt = i;
 			break;
 		}
 		i++;
 	}
+	n_cnt = i;
 	int n_up = v_curr.size() - n_cnt;
 	while (n_up--)
 	{
@@ -307,7 +319,8 @@ string os_path::relpath(const string& path)
 	{
 		s_res += v_target[i++] + "/";
 	}
-	s_res.pop_back();
+	if (s_res.length() > 0)
+		s_res.pop_back();
 	return s_res;
 }
 
@@ -354,7 +367,7 @@ vector<string> os_path::listdir(const string& path)
 #ifdef OS_LINUX
 	s_cmd = "ls " + path;
 #elif OS_WINDOWS
-	s_cmd = "dir " + path;
+	s_cmd = "dir /b " + path;
 #endif
 	FILE* f_pipe = popen(s_cmd.c_str(), "r");
 	if (f_pipe == NULL)

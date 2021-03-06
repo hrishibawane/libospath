@@ -52,14 +52,14 @@ string os_path::abspath(const string& path)
 
 	string s_tmp;
 	stringstream ss_tokenizer1(s_buf);
-	while (getline(ss_tokenizer1, s_tmp, '/'))
+	while (getline(ss_tokenizer1, s_tmp, m_sep))
 	{
 		stk_curr_dir.push(s_tmp);
 	}
 
 	s_tmp.clear();
 	stringstream ss_tokenizer2(path);
-	while (getline(ss_tokenizer2, s_tmp, '/'))
+	while (getline(ss_tokenizer2, s_tmp, m_sep))
 	{
 		if (s_tmp == ".." && !stk_curr_dir.empty())
 		{
@@ -73,13 +73,13 @@ string os_path::abspath(const string& path)
 
 	while (!stk_curr_dir.empty())
 	{
-		s_res = stk_curr_dir.top() + '/' + s_res;
+		s_res = stk_curr_dir.top() + m_sep + s_res;
 		stk_curr_dir.pop();
 	}
-	// Remove extra '/'
+	// Remove extra m_sep
 	s_res.pop_back();
-	if (s_res[0] != '/')
-		s_res = '/' + s_res;
+	if (s_res[0] != m_sep)
+		s_res = m_sep + s_res;
 	return s_res;
 }
 
@@ -228,7 +228,7 @@ long int os_path::getfilesize(const string& path)
 bool os_path::isabs(const string& path)
 {
 	bool b_res = true;
-	if (path.length() == 0 || path[0] != '/')
+	if (path.length() == 0 || path[0] != m_sep)
 	{
 		b_res = false;
 	}
@@ -274,14 +274,14 @@ string os_path::relpath(const string& path)
 	vector<string> v_target;
 	string s_tmp;
 	stringstream ss_tokenizer1(s_curr_path);
-	while (getline(ss_tokenizer1, s_tmp, '/'))
+	while (getline(ss_tokenizer1, s_tmp, m_sep))
 	{
 		v_curr.push_back(s_tmp);
 	}
 
 	s_tmp.clear();
 	stringstream ss_tokenizer2(s_target_path);
-	while (getline(ss_tokenizer2, s_tmp, '/'))
+	while (getline(ss_tokenizer2, s_tmp, m_sep))
 	{
 		v_target.push_back(s_tmp);
 	}
@@ -317,11 +317,11 @@ pair<string, string> os_path::split(const string& path)
 {
 	string tail = "";
 	int n_char = path.length() - 1;
-	while (n_char >= 0 && path[n_char] != '/')
+	while (n_char >= 0 && path[n_char] != m_sep)
 	{
 		tail = path[n_char--] + tail;
 	}
-	while (n_char >= 0 && path[n_char] == '/')
+	while (n_char >= 0 && path[n_char] == m_sep)
 	{
 		n_char--;
 	}
@@ -379,7 +379,7 @@ void os_path::walk(string path, st_data& data)
 	unordered_map<string, vector<string>> mp_dirnames;
 	unordered_map<string, vector<string>> mp_filenames;
 	vector<string> v_seq;
-	if (path[path.length() - 1] == '/')
+	if (path[path.length() - 1] == m_sep)
 	{
 		path.pop_back();
 	}

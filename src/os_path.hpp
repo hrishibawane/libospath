@@ -45,8 +45,10 @@ class os_path
 		/* stat struct to store and retrieve file info */
 #ifdef OS_LINUX
 		struct stat m_info;
+		char m_sep = '/'
 #elif OS_WINDOWS
 		struct _stat m_info;
+		char m_sep = '\\';
 #endif
 
 		/**

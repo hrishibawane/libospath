@@ -10,14 +10,18 @@ using namespace std;
 
 os_path::os_path()
 {
+#ifdef OS_LINUX
 	m_info = {};
+	m_sep = '/';
+#elif OS_WINDOWS
+	m_sep = '\\';
+#endif
 }
 
 //////////////////////////DESTRUCTOR///////////////////////////
 
-os_path::~os_path()
-{
-}
+os_path::~os_path() 
+{}
 
 //////////////////////////ABSPATH//////////////////////////////
 
@@ -34,7 +38,7 @@ string os_path::abspath(const string& path)
 #ifdef OS_LINUX
 	FILE* f_pipe = popen("pwd", "r");
 #elif OS_WINDOWS
-	FILE* f_pipe = popen("cd", "r");
+	FILE* f_pipe = _popen("cd", "r");
 #endif
 	if (f_pipe == NULL)
 	{
@@ -46,7 +50,11 @@ string os_path::abspath(const string& path)
 	{
 		s_buf += m_buffer.data();
 	}
+#ifdef OS_LINUX
 	pclose(f_pipe);
+#elif
+	_pclose(f_pipe);
+#endif
 	if (s_buf[s_buf.length() - 1] == '\n')
 		s_buf.pop_back();
 
@@ -366,10 +374,11 @@ vector<string> os_path::listdir(const string& path)
 	string s_cmd;
 #ifdef OS_LINUX
 	s_cmd = "ls " + path;
+	FILE* f_pipe = popen(s_cmd.c_str(), "r");
 #elif OS_WINDOWS
 	s_cmd = "dir /b " + path;
+	FILE* f_pipe = _popen(s_cmd.c_str(), "r");
 #endif
-	FILE* f_pipe = popen(s_cmd.c_str(), "r");
 	if (f_pipe == NULL)
 	{
 		printf("Error in command execution\n");
@@ -381,7 +390,11 @@ vector<string> os_path::listdir(const string& path)
 		s_buf.pop_back();
 		res.push_back(s_buf);
 	}
+#ifdef OS_LINUX
 	pclose(f_pipe);
+#elif OS_WINDOWS
+	_pclose(f_pipe);
+#endif
 	return res;
 }
 
@@ -399,10 +412,11 @@ void os_path::walk(string path, st_data& data)
 	string s_cmd;
 #ifdef OS_LINUX
 	s_cmd = "find " + path + " -print";
+	FILE* f_pipe = popen(s_cmd.c_str(), "r");
 #elif OS_WINDOWS
 	s_cmd = "dir /s /b " + path;
+	FILE* f_pipe = _popen(s_cmd.c_str(), "r");
 #endif
-	FILE* f_pipe = popen(s_cmd.c_str(), "r");
 	if (f_pipe == NULL)
 	{
 		printf("Error in command execution\n");
@@ -425,13 +439,17 @@ void os_path::walk(string path, st_data& data)
 			mp_filenames[p.first].push_back(p.second);
 		}
 	}
+#ifdef OS_LINUX
+	pclose(f_pipe);
+#elif OS_WINDOWS
+	_pclose(f_pipe);
+#endif
 	for (string s_dir : v_seq)
 	{
 		data.dirpath.push_back(s_dir);
 		data.dirnames.push_back(mp_dirnames[s_dir]);
 		data.filenames.push_back(mp_filenames[s_dir]);
 	}
-	cout << data.dirpath.size() << " " << data.dirnames.size() << " " << data.filenames.size() << endl;
 }
 
 

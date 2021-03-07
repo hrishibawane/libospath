@@ -42,7 +42,7 @@ class os_path
 		/* buffer for data transfers */
 		array<char, MAXBUFFER> m_buffer;
 
-		/* seperator for paths*/
+		/* seperator for paths (OS dependent)*/
 		char m_sep;
 
 		/* stat struct to store and retrieve file info */
@@ -58,8 +58,6 @@ class os_path
 		 * @returns stat() call's return code
 		 */
 		int getstatinfo(const string& path);
-
-		string cleanpathstr(const string& path);
 
 	public:
 		/**

@@ -1,0 +1,25 @@
+
+name: C++ CI
+
+on:
+	push:
+		branches:
+			- master
+			- integration
+	pull_request:
+		branches:
+			- master
+			- integration
+
+jobs:
+	build-ubuntu:
+
+		runs-on: ubuntu-latest
+		steps:
+			- uses: actions/checkout@v1
+			- name: build
+			run: mkdir -p build && cd build && cmake .. -DCMAKE_INSTALL_PREFIX=../install && make install
+			- name: test
+			run: cd test/src && make test
+
+

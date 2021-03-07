@@ -1,4 +1,9 @@
-/////////////////////////PREPROCESSOR DIRECTIVES//////////////////////////
+/*
+	os_path.hpp
+
+	Copyright (c) 2021 Hrishikesh Bawane
+	MIT License
+*/
 
 #pragma once
 
@@ -22,12 +27,9 @@
 #include <sstream>
 #include <climits>
 #include <sys/stat.h>
-
-/////////////////////////////NAMESPACES/////////////////////////////
+#include <algorithm>
 
 using namespace std;
-
-////////////////////////////CLASS DECLARATION/////////////////////////
 
 typedef struct st_data
 {
@@ -58,6 +60,8 @@ class os_path
 		 * @returns stat() call's return code
 		 */
 		int getstatinfo(const string& path);
+
+		string modifypathstr(const string& path);
 
 	public:
 		/**

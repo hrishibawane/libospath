@@ -1,8 +1,11 @@
-//////////////////////////PREPROCESSOR DIRECTIVES/////////////////////////////
+/*
+	os_path.cpp
+
+	Copyright (c) 2021 Hrishikesh Bawane
+	MIT License
+*/
 
 #include "os_path.hpp"
-
-///////////////////////////NAMESPACES//////////////////////////
 
 using namespace std;
 
@@ -27,9 +30,10 @@ os_path::~os_path()
 
 string os_path::abspath(const string& path)
 {
-	if (os_path::isabs(path))
+	string s_path = modifypathstr(path);
+	if (os_path::isabs(s_path))
 	{
-		return path;
+		return s_path;
 	}
 	string s_res = "";
 	string s_buf = "";
@@ -52,7 +56,7 @@ string os_path::abspath(const string& path)
 	}
 #ifdef OS_LINUX
 	pclose(f_pipe);
-#elif
+#elif OS_WINDOWS
 	_pclose(f_pipe);
 #endif
 	if (s_buf[s_buf.length() - 1] == '\n')
@@ -66,7 +70,7 @@ string os_path::abspath(const string& path)
 	}
 
 	s_tmp.clear();
-	stringstream ss_tokenizer2(path);
+	stringstream ss_tokenizer2(s_path);
 	while (getline(ss_tokenizer2, s_tmp, m_sep))
 	{
 		if (s_tmp == ".." && !stk_curr_dir.empty())
@@ -86,8 +90,10 @@ string os_path::abspath(const string& path)
 	}
 	// Remove extra m_sep
 	s_res.pop_back();
+#ifdef OS_LINUX
 	if (s_res[0] != m_sep)
 		s_res = m_sep + s_res;
+#endif
 	return s_res;
 }
 
@@ -107,8 +113,13 @@ string os_path::commonprefix(const vector<string>& paths)
 	{
 		return s_res;
 	}
+	vector<string> v_paths;
+	for (string path : paths)
+	{
+		v_paths.push_back(modifypathstr(path));
+	}
 	int min_length = INT_MAX;
-	for (string s_curr : paths)
+	for (string s_curr : v_paths)
 	{
 		min_length = min(min_length, static_cast<int>(s_curr.length()));
 	}
@@ -116,10 +127,10 @@ string os_path::commonprefix(const vector<string>& paths)
 	for (int n_pos = 0; n_pos < min_length; n_pos++)
 	{
 		bool b_check = true;
-		char c_curr = paths[0][n_pos];
-		for (int n_str = 1; n_str < paths.size(); n_str++)
+		char c_curr = v_paths[0][n_pos];
+		for (int n_str = 1; n_str < v_paths.size(); n_str++)
 		{
-			if (paths[n_str][n_pos] != c_curr)
+			if (v_paths[n_str][n_pos] != c_curr)
 			{
 				b_check = false;
 				break;
@@ -148,11 +159,12 @@ string os_path::dirname(const string& path)
 
 int os_path::getstatinfo(const string& path)
 {
+	string s_path = modifypathstr(path);
 	m_info = {};
 #ifdef OS_LINUX
-	return stat(path.c_str(), &m_info);
+	return stat(s_path.c_str(), &m_info);
 #elif OS_WINDOWS
-	return _stat(path.c_str(), &m_info);
+	return _stat(s_path.c_str(), &m_info);
 #endif
 }
 
@@ -247,8 +259,13 @@ long int os_path::getfilesize(const string& path)
 
 bool os_path::isabs(const string& path)
 {
+	string s_path = modifypathstr(path);
 	bool b_res = true;
+#ifdef OS_LINUX
 	if (path.length() == 0 || path[0] != m_sep)
+#elif OS_WINDOWS
+	if (path.length() == 0 || path[1] != ':' || path[2] != m_sep)
+#endif
 	{
 		b_res = false;
 	}
@@ -279,17 +296,27 @@ bool os_path::isdir(const string& path)
 	return b_res;
 }
 
+///////////////////////////////MODIFYPATHSTR//////////////////////////////
+
+string os_path::modifypathstr(const string& path)
+{
+	string s_path = path;
+	replace(s_path.begin(), s_path.end(), '/', m_sep);
+	return s_path;
+}
+
 ///////////////////////////////////RELPATH////////////////////////////////
 
 string os_path::relpath(const string& path)
 {
-	if (!os_path::isabs(path))
+	string s_path = modifypathstr(path);
+	if (!os_path::isabs(s_path))
 	{
-		return path;
+		return s_path;
 	}
 	string s_res = "";
 	string s_curr_path = os_path::abspath(".");
-	string s_target_path = path;
+	string s_target_path = s_path;
 	vector<string> v_curr;
 	vector<string> v_target;
 	string s_tmp;
@@ -336,17 +363,18 @@ string os_path::relpath(const string& path)
 
 pair<string, string> os_path::split(const string& path)
 {
+	string s_path = modifypathstr(path);
 	string tail = "";
-	int n_char = path.length() - 1;
-	while (n_char >= 0 && path[n_char] != m_sep)
+	int n_char = s_path.length() - 1;
+	while (n_char >= 0 && s_path[n_char] != m_sep)
 	{
-		tail = path[n_char--] + tail;
+		tail = s_path[n_char--] + tail;
 	}
-	while (n_char >= 0 && path[n_char] == m_sep)
+	while (n_char >= 0 && s_path[n_char] == m_sep)
 	{
 		n_char--;
 	}
-	string head(path, 0, n_char + 1);
+	string head(s_path, 0, n_char + 1);
 	return make_pair(head, tail);
 }
 
@@ -354,14 +382,15 @@ pair<string, string> os_path::split(const string& path)
 
 pair<string, string> os_path::splitext(const string& path)
 {
+	string s_path = modifypathstr(path);
 	string ext = "";
-	int n_char = path.length() - 1;
-	while (n_char >= 0 && path[n_char] != '.')
+	int n_char = s_path.length() - 1;
+	while (n_char >= 0 && s_path[n_char] != '.')
 	{
-		ext = path[n_char--] + ext;
+		ext = s_path[n_char--] + ext;
 	}
-	ext = path[n_char--] + ext;
-	string root(path, 0, n_char + 1);
+	ext = s_path[n_char--] + ext;
+	string root(s_path, 0, n_char + 1);
 	return root.length() == 0 ? make_pair(ext, root) : make_pair(root, ext);
 }
 
@@ -369,6 +398,7 @@ pair<string, string> os_path::splitext(const string& path)
 
 vector<string> os_path::listdir(const string& path)
 {
+	string s_path = modifypathstr(path);
 	vector<string> res;
 	string s_buf = "";
 	string s_cmd;
@@ -376,7 +406,7 @@ vector<string> os_path::listdir(const string& path)
 	s_cmd = "ls " + path;
 	FILE* f_pipe = popen(s_cmd.c_str(), "r");
 #elif OS_WINDOWS
-	s_cmd = "dir /b " + path;
+	s_cmd = "dir /b \"" + path + "\"";
 	FILE* f_pipe = _popen(s_cmd.c_str(), "r");
 #endif
 	if (f_pipe == NULL)
@@ -402,6 +432,7 @@ vector<string> os_path::listdir(const string& path)
 
 void os_path::walk(string path, st_data& data)
 {
+	string s_path = modifypathstr(path);
 	unordered_map<string, vector<string>> mp_dirnames;
 	unordered_map<string, vector<string>> mp_filenames;
 	vector<string> v_seq;
@@ -414,7 +445,7 @@ void os_path::walk(string path, st_data& data)
 	s_cmd = "find " + path + " -print";
 	FILE* f_pipe = popen(s_cmd.c_str(), "r");
 #elif OS_WINDOWS
-	s_cmd = "dir /s /b " + path;
+	s_cmd = "dir /s /b \"" + path + "\"";
 	FILE* f_pipe = _popen(s_cmd.c_str(), "r");
 #endif
 	if (f_pipe == NULL)

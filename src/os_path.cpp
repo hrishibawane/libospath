@@ -10,12 +10,7 @@ using namespace std;
 
 os_path::os_path()
 {
-#ifdef OS_LINUX
-	m_info = {};
 	m_sep = '/';
-#elif OS_WINDOWS
-	m_sep = '\\';
-#endif
 }
 
 //////////////////////////DESTRUCTOR///////////////////////////
@@ -57,7 +52,8 @@ string os_path::abspath(const string& path)
 #endif
 	if (s_buf[s_buf.length() - 1] == '\n')
 		s_buf.pop_back();
-
+	
+	s_buf = os_path::cleanpathstr(s_buf);
 	string s_tmp;
 	stringstream ss_tokenizer1(s_buf);
 	while (getline(ss_tokenizer1, s_tmp, m_sep))
@@ -86,8 +82,10 @@ string os_path::abspath(const string& path)
 	}
 	// Remove extra m_sep
 	s_res.pop_back();
+#ifdef OS_LINUX
 	if (s_res[0] != m_sep)
 		s_res = m_sep + s_res;
+#endif
 	return s_res;
 }
 
@@ -96,6 +94,17 @@ string os_path::abspath(const string& path)
 string os_path::basename(const string& path)
 {
 	return os_path::split(path).second;
+}
+
+///////////////////////////////CLEANPATHSTR/////////////////////////////////
+
+string os_path::cleanpathstr(const string& path)
+{
+	string s_path = path;
+#ifdef OS_WINDOWS
+	replace(s_path.begin(), s_path.end(), '/', '\\');
+#endif
+	return s_path;
 }
 
 ///////////////////////////////COMMONPREFIX/////////////////////////////////
@@ -283,10 +292,12 @@ bool os_path::isdir(const string& path)
 
 string os_path::relpath(const string& path)
 {
+#ifdef OS_LINUX
 	if (!os_path::isabs(path))
 	{
 		return path;
 	}
+#endif
 	string s_res = "";
 	string s_curr_path = os_path::abspath(".");
 	string s_target_path = path;
@@ -388,6 +399,7 @@ vector<string> os_path::listdir(const string& path)
 	{
 		string s_buf = m_buffer.data();
 		s_buf.pop_back();
+		s_buf = os_path::cleanpathstr(s_buf);
 		res.push_back(s_buf);
 	}
 #ifdef OS_LINUX
@@ -426,6 +438,7 @@ void os_path::walk(string path, st_data& data)
 	{
 		string s_buf = m_buffer.data();
 		s_buf.pop_back();
+		s_buf = os_path::cleanpathstr(s_buf);
 		pair<string, string> p;
 		if (os_path::isdir(s_buf))
 		{

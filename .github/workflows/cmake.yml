@@ -3,12 +3,12 @@ name: "CMake"
 on:
   push:
     branches:
-    - master
-    - integration
+      - master
+      - integration
   pull_request:
     branches:
-    - master
-    - integration
+      - master
+      - integration
 
 env:
   BUILD_TYPE: Release
@@ -17,21 +17,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
   steps: 
-  - uses: actions/checkout@v1
-  - name: Create Build Environment
-    run: "cmake -E make_directory ${{github.workspace}}/build"
+    - uses: actions/checkout@v1
+    - name: Create Build Environment
+      run: "cmake -E make_directory ${{github.workspace}}/build"
 
-  - name: Configure CMake
-    shell: bash
-    working-directory: ${{github.workspace}}/build
-    run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
-  - name: Build
-    working-directory: ${{github.workspace}}/build
-    shell: bash
-    run: make install
+    - name: Build
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: make install
 
-  - name: Test
-    working-directory: ${{github.workspace}}/test/src
-    shell: bash
-    run: make test
+    - name: Test
+      working-directory: ${{github.workspace}}/test/src
+      shell: bash
+      run: make test

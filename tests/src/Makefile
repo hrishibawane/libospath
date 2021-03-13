@@ -7,4 +7,4 @@ test: clean
 	$(CXX) *.cpp -o $(EXE) $(LIBFLAGS)
 
 clean:
-	rm test
+	rm -f test

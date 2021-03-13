@@ -1,23 +1,37 @@
+name: "CMake"
 
-name: "C++ CI"
-jobs: 
-  build-ubuntu: 
-    runs-on: ubuntu-latest
-    steps: 
-      - 
-        uses: actions/checkout@v1
-      - 
-        name: build
-        run: "mkdir -p build && cd build && cmake .. -DCMAKE_INSTALL_PREFIX=../install && make install"
-      - 
-        name: test
-        run: "cd test/src && make test"
-true: 
-  pull_request: 
-    branches: 
-      - master
-      - integration
-  push: 
-    branches: 
-      - master
-      - integration
+on:
+	push:
+		branches:
+		- master
+		- integration
+	pull_request:
+		branches:
+		- master
+		- integration
+
+env:
+	BUILD_TYPE: Release
+
+jobs:
+	build:
+    	runs-on: ubuntu-latest
+	steps: 
+	- uses: actions/checkout@v1
+	- name: Create Build Environment
+	  run: "cmake -E make_directory ${{github.workspace}}/build"
+
+	- name: Configure CMake
+	  shell: bash
+	  working-directory: ${{github.workspace}}/build
+	  run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+	- name: Build
+	  working-directory: ${{github.workspace}}/build
+	  shell: bash
+	  run: make install
+
+	- name: Test
+	  working-directory: ${{github.workspace}}/test/src
+	  shell: bash
+	  run: make test
